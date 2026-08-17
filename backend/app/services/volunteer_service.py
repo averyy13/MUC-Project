@@ -1,15 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.repositories.volunteer_repository import VolunteerRepository
 from app.schemas.location import LocationUpdateRequest
 
-
 class VolunteerService:
-    """
-    Business logic for volunteer-related operations.
-    """
-
     @staticmethod
     async def get_profile(
         db: AsyncSession,
@@ -25,7 +19,15 @@ class VolunteerService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Volunteer not found",
             )
-
+        home_location = await VolunteerRepository.get_home_location(
+            db,
+            volunteer.id,
+        )
+        current_location = await VolunteerRepository.get_current_location(
+            db,
+            volunteer.id,
+        )
+  
         return {
             "volunteer_id": volunteer.id,
             "user_id": volunteer.user.id,
@@ -37,6 +39,8 @@ class VolunteerService:
             "approval_status": volunteer.approval_status.value,
             "availability": volunteer.availability,
             "certificate_url": volunteer.certificate_url,
+            "home_location": home_location,
+            "current_location": current_location,
         }
 
     @staticmethod
@@ -91,6 +95,7 @@ class VolunteerService:
             longitude=location.longitude,
         )
 
+        await db.commit()
         return {
             "message": "Current location updated successfully."
         }
@@ -130,10 +135,7 @@ class VolunteerService:
         user_id,
         availability: bool,
     ):
-        volunteer = await VolunteerRepository.get_by_user_id(
-            db,
-            user_id,
-        )
+        volunteer = await VolunteerRepository.get_by_user_id(db, user_id)  
 
         if volunteer is None:
             raise HTTPException(

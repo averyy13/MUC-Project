@@ -1,8 +1,6 @@
 from __future__ import annotations
-
 import uuid
 from datetime import datetime
-
 from geoalchemy2 import Geography
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
@@ -13,14 +11,11 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-
 from app.db.base import Base
 from app.models.enums import MedicalFacilityType
 
-
 class MedicalFacility(Base):
     __tablename__ = "medical_facilities"
-
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,

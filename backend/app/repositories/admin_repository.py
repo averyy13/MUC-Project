@@ -1,11 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.user import User
 from app.models.volunteer import Volunteer
 from app.models.enums import ApprovalStatus
-
+from app.models import volunteer
 
 class AdminRepository:
 
@@ -37,3 +36,13 @@ class AdminRepository:
         )
 
         return result.scalar_one_or_none()
+    
+    @staticmethod
+    async def update_status(
+        db: AsyncSession,
+        volunteer: Volunteer,
+        status: ApprovalStatus,
+    ):
+        volunteer.approval_status = status
+        await db.flush()
+        return volunteer

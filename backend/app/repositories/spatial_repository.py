@@ -1,15 +1,8 @@
+from unittest import result
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.db.spatial_queries import (
-    FIND_NEAREST_MEDICAL_FACILITIES,
-    FIND_NEAREST_RESCUE_CONTACTS,
-    FIND_NEAREST_VOLUNTEERS,
-)
-
-
+from app.db.spatial_queries import (FIND_NEAREST_MEDICAL_FACILITIES, FIND_NEAREST_RESCUE_CONTACTS, FIND_NEAREST_VOLUNTEERS,)
 class SpatialRepository:
-
     @staticmethod
     async def nearest_volunteers(
         db: AsyncSession,
@@ -17,7 +10,6 @@ class SpatialRepository:
         longitude: float,
         limit: int = 20,
     ):
-
         result = await db.execute(
             text(FIND_NEAREST_VOLUNTEERS),
             {
@@ -26,10 +18,7 @@ class SpatialRepository:
                 "limit": limit,
             },
         )
-
-        return result.mappings().all()
-
-
+        return [dict(row) for row in result.mappings().all()]
     @staticmethod
     async def nearest_rescue_contacts(
         db: AsyncSession,
@@ -37,7 +26,6 @@ class SpatialRepository:
         longitude: float,
         limit: int = 3,
     ):
-
         result = await db.execute(
             text(FIND_NEAREST_RESCUE_CONTACTS),
             {
@@ -46,10 +34,8 @@ class SpatialRepository:
                 "limit": limit,
             },
         )
-
-        return result.mappings().all()
-
-
+        return [dict(row) for row in result.mappings().all()]    
+    
     @staticmethod
     async def nearest_facilities(
         db: AsyncSession,
@@ -57,7 +43,6 @@ class SpatialRepository:
         longitude: float,
         limit: int = 5,
     ):
-
         result = await db.execute(
             text(FIND_NEAREST_MEDICAL_FACILITIES),
             {
@@ -66,5 +51,5 @@ class SpatialRepository:
                 "limit": limit,
             },
         )
-
-        return result.mappings().all()
+        return [dict(row) for row in result.mappings().all()]
+        

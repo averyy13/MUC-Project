@@ -1,6 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from fastapi import HTTPException, status
+from geoalchemy2.elements import WKTElement
+from app.models.current_volunteer_location import CurrentVolunteerLocation
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.enums import ApprovalStatus, UserRole
 from app.models.user import User
@@ -8,10 +10,10 @@ from app.models.volunteer import Volunteer
 from app.repositories.auth_repository import AuthRepository
 from app.repositories.volunteer_repository import VolunteerRepository
 from app.schemas.auth import LoginRequest, VolunteerRegisterRequest
+from app.models import user
 
 
 class AuthService:
-
     @staticmethod
     async def register_volunteer(
         db: AsyncSession,
@@ -48,12 +50,9 @@ class AuthService:
             password_hash=hash_password(data.password),
             role=UserRole.VOLUNTEER
         )
+        await AuthRepository.create_user( db, user )
 
-        await AuthRepository.create_user(
-            db,
-            user
-        )
-
+        # Create volunteer
         volunteer = Volunteer(
             user_id=user.id,
             nrc_number=data.nrc_number,
@@ -63,11 +62,20 @@ class AuthService:
             availability=False
         )
 
-        await VolunteerRepository.create_volunteer(
-            db,
-            volunteer
-        )
-
+        await VolunteerRepository.create_volunteer( db,volunteer )
+        
+        if data.latitude is not None and data.longitude is not None: 
+            point = WKTElement( 
+                f"POINT({data.longitude} {data.latitude})",
+                srid=4326,
+                ) 
+            current_location = CurrentVolunteerLocation( 
+                volunteer_id=volunteer.id, 
+                location=point, 
+                speed=0, heading=0,
+            ) 
+            db.add(current_location)
+        
         await db.commit()
 
         return {
@@ -106,12 +114,6 @@ class AuthService:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Volunteer profile not found"
-                )
-
-            if user.volunteer.approval_status != ApprovalStatus.APPROVED:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Volunteer account is {user.volunteer.approval_status.value.lower()}."
                 )
 
         token = create_access_token(

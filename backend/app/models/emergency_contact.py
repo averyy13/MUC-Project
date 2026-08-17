@@ -51,7 +51,10 @@ class EmergencyContact(Base):
     )
 
     location: Mapped[object] = mapped_column(
-        Geography("POINT", srid=4326),
+        Geography(
+            "POINT",
+            srid=4326,
+        ),
         nullable=False,
     )
 

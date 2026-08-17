@@ -1,4 +1,4 @@
-from sqlalchemy import select, text
+from sqlalchemy import select, text,update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -62,4 +62,55 @@ class VolunteerRepository:
                 "longitude": longitude,
             },
         )
+
+
+    @staticmethod
+    async def get_home_location(db, volunteer_id):
+        result = await db.execute(
+            text(
+                """
+                SELECT
+                    ST_Y(home_location::geometry) AS latitude,
+                    ST_X(home_location::geometry) AS longitude
+                FROM volunteers
+                WHERE id = :volunteer_id
+                """
+            ),
+            {"volunteer_id": volunteer_id},
+        )
+
+        row = result.mappings().first()
+        return dict(row) if row else None
+
+    @staticmethod
+    async def get_current_location(db, volunteer_id):
+        result = await db.execute(
+            text(
+                """
+                SELECT
+                    ST_Y(location::geometry) AS latitude,
+                    ST_X(location::geometry) AS longitude,
+                    updated_at
+                FROM current_volunteer_locations
+                WHERE volunteer_id = :volunteer_id
+                """
+            ),
+            {"volunteer_id": volunteer_id},
+        )
+
+        row = result.mappings().first()
+        return dict(row) if row else None
+
+    @staticmethod
+    async def update_availability(
+        db: AsyncSession,
+        volunteer_id,
+        availability: bool,
+    ):
+        await db.execute(
+            update(Volunteer)
+            .where(Volunteer.id == volunteer_id)
+            .values(availability=availability)
+        )
+
         await db.commit()

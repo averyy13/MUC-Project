@@ -104,42 +104,28 @@ CREATE TABLE first_aid_steps (
 -- ======================================================
 CREATE TABLE emergency_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     category_id INTEGER NOT NULL,
-
     requester_id UUID,
-
     description TEXT,
-
     location GEOGRAPHY(Point, 4326) NOT NULL,
-
     status emergency_status NOT NULL DEFAULT 'SEARCHING',
-
     assigned_volunteer_id UUID,
-
     assigned_rescue_contact_id UUID,
-
     accepted_at TIMESTAMPTZ,
-
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
     CONSTRAINT fk_request_category
         FOREIGN KEY (category_id)
         REFERENCES emergency_categories(id)
         ON DELETE RESTRICT,
-
     CONSTRAINT fk_request_user
         FOREIGN KEY (requester_id)
         REFERENCES users(id)
         ON DELETE SET NULL,
-
     CONSTRAINT fk_request_volunteer
         FOREIGN KEY (assigned_volunteer_id)
         REFERENCES volunteers(id)
         ON DELETE SET NULL,
-
     CONSTRAINT fk_request_rescue
         FOREIGN KEY (assigned_rescue_contact_id)
         REFERENCES emergency_contacts(id)
@@ -178,32 +164,23 @@ CREATE TABLE current_volunteer_locations (
     
     CONSTRAINT fk_current_location_volunteer FOREIGN KEY(volunteer_id) REFERENCES volunteers(id) ON DELETE CASCADE
 );
-
+ 
 
 -- ======================================================
 -- 11. EMERGENCY NOTIFICATIONS TABLE (For Push Notifications to Volunteers)
 -- ======================================================
 CREATE TABLE emergency_notifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     emergency_request_id UUID NOT NULL
         REFERENCES emergency_requests(id) ON DELETE CASCADE,
-
     volunteer_id UUID NOT NULL
         REFERENCES volunteers(id) ON DELETE CASCADE,
-
     notification_order INTEGER NOT NULL,
-
     batch_number INTEGER NOT NULL,
-
     status notification_status NOT NULL DEFAULT 'PENDING',
-
     sent_at TIMESTAMPTZ,
-
     responded_at TIMESTAMPTZ,
-
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 -- ======================================================

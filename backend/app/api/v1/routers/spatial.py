@@ -31,6 +31,6 @@ async def nearby(
 
     return {
         "volunteers": volunteers,
-        "rescue_contacts": rescue,
+        "nearest_rescue_contact": rescue,
         "medical_facilities": facilities,
     }

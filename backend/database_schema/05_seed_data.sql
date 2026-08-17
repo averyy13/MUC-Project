@@ -26,6 +26,7 @@ INSERT INTO emergency_categories (name_en, name_mm, priority) VALUES
 ('Burn', 'မီးလောင်ဒဏ်ရာ', 2),
 ('Choking', 'အသက်ရှူလမ်းကြောင်းပိတ်ခြင်း', 1),
 ('Fracture', 'အရိုးကျိုးခြင်း', 2);
+('General Emergency', 'အထွေထွေအရေးပေါ်', 1);
 
 -- ======================================================
 -- 3. FIRST AID STEPS SEED
@@ -191,71 +192,9 @@ INSERT INTO first_aid_steps (category_id, step_number, instruction_en, instructi
 (10, 5, 'Elevate the limb if possible and call for help. If it does not cause further pain, elevate the injured limb above heart level to reduce swelling. Call emergency services or safely transport to the hospital.', 
        'ခြေလက်ကို မြှင့်ထားပြီး အကူအညီတောင်းပါ။ နာကျင်မှု ပိုမဆိုးစေပါက ရောင်ရမ်းမှုကျစေရန် ဒဏ်ရာရထားသော ခြေလက်ကို နှလုံးအထက် မြှင့်ထားပေးပါ။ အရေးပေါ်အဖွဲ့ထံ ဖုန်းခေါ်ဆိုပါ (သို့မဟုတ်) ဆေးရုံသို့ စနစ်တကျ ပို့ဆောင်ပါ။');
 
--- Final Verification Query across ALL 10 categories
-SELECT category_id, COUNT(*) 
-FROM first_aid_steps 
-GROUP BY category_id
-ORDER BY category_id;
+-- -- Final Verification Query across ALL 10 categories
+-- SELECT category_id, COUNT(*) 
+-- FROM first_aid_steps 
+-- GROUP BY category_id
+-- ORDER BY category_id;
 
--- ======================================================
--- 4. EMERGENCY CONTACTS SEED (Sample Static Records for Development)
--- ======================================================
--- Point Coordinates: SRID 4326 (Longitude, Latitude) - Yangon Core Area
-INSERT INTO emergency_contacts (name_en, name_mm, phone, type, location) VALUES
-(
-    'Yangon Rescue Team', 'ရန်ကုန်တိုင်း ကယ်ဆယ်ရေးအဖွဲ့', '091111111', 'RESCUE_TEAM', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1561 16.8052)')
-),
-(
-    'Myanmar Red Cross', 'မြန်မာနိုင်ငံ ကြက်ခြေနီအသင်း', '092222222', 'RED_CROSS', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1292 16.7931)')
-),
-(
-    'Yangon Ambulance Service', 'ရန်ကုန် အရေးပေါ်လူနာတင်ယာဉ်ဝန်ဆောင်မှု', '192', 'AMBULANCE', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1743 16.7794)')
-),
-(
-    'Fire Services Department', 'မီးသတ်ဦးစီးဌာန', '191', 'FIRE_DEPARTMENT', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1610 16.7820)')
-);
-
--- ======================================================
--- 5. MEDICAL FACILITIES SEED (Sample Static Records for Development)
--- ======================================================
-INSERT INTO medical_facilities (name_en, name_mm, phone, address_en, address_mm, type, location) VALUES
-(
-    'Yangon General Hospital', 'ရန်ကုန်ပြည်သူ့ဆေးရုံကြီး', '01256112', 
-    'Bogyoke Aung San Road, Latha Township', 'ဗိုလ်ချုပ်အောင်ဆန်းလမ်း၊ လသာမြို့နယ်', 'HOSPITAL', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1517 16.7792)')
-),
-(
-    'New Yangon General Hospital', 'ရန်ကုန်ဆေးရုံသစ်ကြီး (ဂျပန်ဆေးရုံ)', '01371131', 
-    'Ziwaka Road, Dagon Township', 'ဇီဝကလမ်း၊ ဒဂုံမြို့နယ်', 'HOSPITAL', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1452 16.7865)')
-),
-(
-    'Insein General Hospital', 'အင်းစိန်ပြည်သူ့ဆေးရုံကြီး', '01640037', 
-    'Mingaladon Road, Insein Township', 'မင်္ဂလာဒုံလမ်း၊ အင်းစိန်မြို့နယ်', 'HOSPITAL', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1112 16.8882)')
-),
-(
-    'ABC Clinic', 'ABC အထွေထွေရောဂါကုဆေးခန်း', '094444444', 
-    'Hledan Road, Kamayut Township', 'လှည်းတန်းလမ်း၊ ကမာရွတ်မြို့နယ်', 'CLINIC', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1278 16.8256)')
-),
-(
-    'DEF Clinic', 'DEF မိသားစုဆေးခန်း', '095555555', 
-    'Parami Road, Yankin Township', 'ပါရမီလမ်း၊ ရန်ကင်းမြို့နယ်', 'CLINIC', 
-    ST_GeographyFromText('SRID=4326;POINT(96.1652 16.8411)')
-);
-
--- Verification counts to ensure seed success
-SELECT 'users' AS table_name, COUNT(*) FROM users
-UNION ALL
-SELECT 'emergency_categories', COUNT(*) FROM emergency_categories
-UNION ALL
-SELECT 'first_aid_steps', COUNT(*) FROM first_aid_steps
-UNION ALL
-SELECT 'emergency_contacts', COUNT(*) FROM emergency_contacts
-UNION ALL
-SELECT 'medical_facilities', COUNT(*) FROM medical_facilities;

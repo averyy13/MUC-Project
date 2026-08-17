@@ -13,7 +13,6 @@ from sqlalchemy.orm import relationship
 
 class Volunteer(Base):
     __tablename__ = "volunteers"
-
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,

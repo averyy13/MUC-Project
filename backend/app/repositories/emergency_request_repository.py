@@ -1,9 +1,9 @@
 from uuid import UUID
+from datetime import datetime, timezone
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.emergency_request import EmergencyRequest
 from app.models.enums import EmergencyStatus
-
 
 class EmergencyRequestRepository:
 
@@ -39,3 +39,19 @@ class EmergencyRequestRepository:
             .returning(EmergencyRequest)
         )
         return result.scalar_one_or_none()
+    
+    @staticmethod
+    async def assign_volunteer(
+        db: AsyncSession,
+        emergency: EmergencyRequest,
+        volunteer_id,
+    ):
+
+        emergency.assigned_volunteer_id = volunteer_id
+        emergency.status = EmergencyStatus.ASSIGNED
+        emergency.accepted_at = datetime.now(timezone.utc)
+
+        await db.flush()
+        await db.refresh(emergency)
+
+        return emergency

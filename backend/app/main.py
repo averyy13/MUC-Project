@@ -8,8 +8,11 @@ from app.api.v1.routers.emergency_categories import router as emergency_category
 from app.api.v1.routers.auth import router as auth_router
 from app.api.v1.routers.admin import router as admin_router
 from app.api.v1.routers.volunteers import router as volunteer_router
-from app.api.v1.routers.emergency_requests import router as emergency_router
-
+from app.api.v1.routers.emergency_requests import router as emergency_request_router
+from app.api.v1.routers.first_aid import router as first_aid_router
+from app.api.v1.routers.emergency_categories import router as emergency_categories_router
+from app.api.v1.routers.facilities import router as facilities_router
+from app.api.v1.routers.emergency_contacts import router as emergency_contacts_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -67,5 +70,25 @@ app.include_router(
 )
 app.include_router(
     spatial_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    emergency_request_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    first_aid_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    facilities_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    emergency_categories_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    emergency_contacts_router,
     prefix="/api/v1",
 )
