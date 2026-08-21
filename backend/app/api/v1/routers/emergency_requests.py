@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.schemas.emergency_assignment import AcceptEmergencyResponse
 from app.db.session import get_db
-from app.schemas.emergency_request import SOSRequest, SOSResponse
+from app.schemas.emergency_request import EmergencyStatusResponse, SOSRequest, SOSResponse
 from app.services.emergency_request_service import EmergencyRequestService
 
 router = APIRouter(
@@ -16,12 +16,22 @@ async def create_sos(
     request: SOSRequest,
     db: AsyncSession = Depends(get_db),
 ):
-
     return await EmergencyRequestService.create_sos(
         db=db,
         data=request,
     )
-    
+@router.get(
+    "/{emergency_id}",
+    response_model=EmergencyStatusResponse,
+)
+async def get_emergency_status(
+    emergency_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    return await EmergencyRequestService.get_emergency_status(
+        db=db,
+        emergency_id=emergency_id,
+    )   
 @router.post(
     "/{emergency_id}/accept/{volunteer_id}",
     response_model=AcceptEmergencyResponse,

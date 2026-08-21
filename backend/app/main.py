@@ -13,13 +13,15 @@ from app.api.v1.routers.first_aid import router as first_aid_router
 from app.api.v1.routers.emergency_categories import router as emergency_categories_router
 from app.api.v1.routers.facilities import router as facilities_router
 from app.api.v1.routers.emergency_contacts import router as emergency_contacts_router
+from app.api.v1.routers.device_tokens import router as device_tokens_router
+from app.core.firebase import initialize_firebase
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Runs once when the application starts and once when it shuts down.
     Used here to verify database connectivity.
     """
-
+    initialize_firebase()
     try:
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
@@ -90,5 +92,9 @@ app.include_router(
 )
 app.include_router(
     emergency_contacts_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    device_tokens_router,
     prefix="/api/v1",
 )

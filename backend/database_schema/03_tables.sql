@@ -40,7 +40,6 @@ CREATE TABLE device_tokens (
     platform device_platform NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    
     CONSTRAINT fk_device_volunteer FOREIGN KEY(volunteer_id) REFERENCES volunteers(id) ON DELETE CASCADE
 );
 

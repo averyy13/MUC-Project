@@ -1,8 +1,8 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, cast
 from sqlalchemy.ext.asyncio import AsyncSession
+from geoalchemy2 import Geography, Geometry  # <-- Added Geometry here
 
 from app.models.emergency_contact import EmergencyContact
-
 
 class EmergencyContactRepository:
 
@@ -13,7 +13,8 @@ class EmergencyContactRepository:
         longitude: float,
         limit: int = 5,
     ):
-        user_location = func.ST_SetSRID(
+        # Create user's location as GEOMETRY first
+        user_location_geometry = func.ST_SetSRID(
             func.ST_MakePoint(
                 longitude,
                 latitude,
@@ -21,26 +22,32 @@ class EmergencyContactRepository:
             4326,
         )
 
+        # Explicitly convert it to GEOGRAPHY
+        # because EmergencyContact.location is GEOGRAPHY.
+        user_location = cast(
+            user_location_geometry,
+            Geography(
+                geometry_type="POINT",
+                srid=4326,
+            ),
+        )
+
+        # Distance in meters because both values are GEOGRAPHY.
         distance_meters = func.ST_Distance(
             EmergencyContact.location,
             user_location,
         )
 
-        longitude_result = func.ST_X(
-            func.ST_GeomFromEWKB(
-                func.ST_AsEWKB(
-                    EmergencyContact.location
-                )
-            )
-        )
+        # ---------------------------------------------------------
+        # FIX: Cast Geography to Geometry to safely extract X and Y
+        # ---------------------------------------------------------
+        location_as_geometry = cast(EmergencyContact.location, Geometry)
 
-        latitude_result = func.ST_Y(
-            func.ST_GeomFromEWKB(
-                func.ST_AsEWKB(
-                    EmergencyContact.location
-                )
-            )
-        )
+        # Extract longitude from the geometry point.
+        longitude_result = func.ST_X(location_as_geometry)
+
+        # Extract latitude from the geometry point.
+        latitude_result = func.ST_Y(location_as_geometry)
 
         query = (
             select(

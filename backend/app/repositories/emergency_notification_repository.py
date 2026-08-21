@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
+from unittest import result
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.emergency_notification import EmergencyNotification
 from app.models.enums import NotificationStatus
+from app import db
 
 
 class EmergencyNotificationRepository:
@@ -34,7 +36,6 @@ class EmergencyNotificationRepository:
         await db.flush()
         return notifications
 
-
     @staticmethod
     async def get_for_volunteer(
         db: AsyncSession,
@@ -51,7 +52,35 @@ class EmergencyNotificationRepository:
 
         return result.scalar_one_or_none()
 
+    @staticmethod
+    async def get_pending_for_volunteers(
+       db: AsyncSession,
+       emergency_request_id,
+       volunteer_ids: list,
+    ):
+        if not volunteer_ids:
+           return []
 
+        result = await db.execute(
+            select(EmergencyNotification).where(
+               EmergencyNotification.emergency_request_id
+               == emergency_request_id,
+               EmergencyNotification.volunteer_id.in_(volunteer_ids),
+            )
+        )
+
+        return result.scalars().all()
+
+    @staticmethod
+    async def mark_sent(
+        db: AsyncSession,
+        notification: EmergencyNotification,
+    ):
+        notification.status = NotificationStatus.SENT
+        notification.sent_at = datetime.now(timezone.utc)
+
+        await db.flush()
+    
     @staticmethod
     async def mark_accepted(
         db: AsyncSession,
@@ -62,7 +91,6 @@ class EmergencyNotificationRepository:
         notification.responded_at = datetime.now(timezone.utc)
 
         await db.flush()
-
 
     @staticmethod
     async def cancel_other_pending(
@@ -85,3 +113,4 @@ class EmergencyNotificationRepository:
             notification.status = NotificationStatus.DECLINED
 
         await db.flush()
+        

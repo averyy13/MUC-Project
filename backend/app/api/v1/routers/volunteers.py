@@ -7,7 +7,8 @@ from app.schemas.location import LocationUpdateRequest
 from app.services.volunteer_service import VolunteerService
 from app import db
 from app.schemas.location import (LocationUpdateRequest, AvailabilityUpdateRequest, )
-
+from app.schemas.device_token import DeviceTokenRegisterRequest, DeviceTokenResponse
+from app.services.device_token_service import DeviceTokenService
 
 router = APIRouter(
     prefix="/volunteers",
@@ -57,4 +58,20 @@ async def update_availability(
         db,
         current_user.id,
         data.availability,
+    )
+    
+@router.post(
+    "/me/device-token",
+    response_model=DeviceTokenResponse,
+)
+async def register_device_token(
+    request: DeviceTokenRegisterRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_volunteer),
+):
+    return await DeviceTokenService.register_token(
+        db=db,
+        user_id=current_user.id,
+        fcm_token=request.fcm_token,
+        platform=request.platform,
     )

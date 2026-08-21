@@ -1,17 +1,13 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.db.session import get_db
 from app.services.emergency_contact_service import (
     EmergencyContactService,
 )
-
-
 router = APIRouter(
     prefix="/emergency-contacts",
     tags=["Emergency Contacts"],
 )
-
 
 @router.get("/nearby")
 async def get_nearby_rescue_teams(

@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 class EmergencyContactResponse(BaseModel):
     id: str
     name_en: str

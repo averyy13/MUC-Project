@@ -14,9 +14,33 @@ class RescueContactResponse(BaseModel):
     latitude: float
     longitude: float
     distance_meters: float
-    
 class SOSResponse(BaseModel):
     emergency_id: UUID
     notified_volunteers: int
     nearest_rescue_contact: RescueContactResponse
     medical_facilities: list
+class AssignedVolunteerLocationResponse(BaseModel):
+    latitude: float
+    longitude: float
+    speed: float | None = None
+    heading: float | None = None
+
+
+class AssignedVolunteerResponse(BaseModel):
+    id: UUID
+    name: str
+    phone: str
+    location: AssignedVolunteerLocationResponse | None = None
+
+
+class EmergencyStatusResponse(BaseModel):
+    emergency_id: UUID
+    status: str
+    category_id: int
+    category_name_en: str
+    category_name_mm: str
+    description: str | None = None
+    latitude: float
+    longitude: float
+    distance_meters: float | None = None
+    assigned_volunteer: AssignedVolunteerResponse | None = None

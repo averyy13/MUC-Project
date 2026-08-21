@@ -110,7 +110,7 @@ celerybeat.pid
 # Environments
 .env.local
 .env.*.local
-
+firebase-service-account.json
 # Spyder
 .spyderproject
 .spyproject
@@ -155,6 +155,7 @@ Thumbs.db
 # Firebase credentials
 firebase-credentials.json
 *-firebase-adminsdk-*.json
+firebase-service-account.json
 
 # Local database
 *.db

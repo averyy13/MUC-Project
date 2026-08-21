@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     FCM_PROJECT_ID: str | None = None
     FCM_CLIENT_EMAIL: str | None = None
     FCM_PRIVATE_KEY: str | None = None
-
+    FIREBASE_CREDENTIALS_PATH: str
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:

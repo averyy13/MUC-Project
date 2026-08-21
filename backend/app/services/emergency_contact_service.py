@@ -1,13 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.repositories.emergency_contact_repository import (
     EmergencyContactRepository,
 )
-
-
 class EmergencyContactService:
-
     @staticmethod
     async def get_nearby_rescue_teams(
         db: AsyncSession,
@@ -15,7 +11,6 @@ class EmergencyContactService:
         longitude: float,
         limit: int = 5,
     ):
-
         if limit < 1 or limit > 20:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
