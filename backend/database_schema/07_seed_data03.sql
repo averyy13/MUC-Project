@@ -135,117 +135,117 @@ INSERT INTO medical_facilities (name_en, name_mm, phone, address_en, address_mm,
 ),
 (
     'Parami Hospital', 'ပါရမီအထွေထွေရောဂါကုဆေးရုံ', '01657232', 
-    'No-60, G-1,  Parami Road, Mayangone', 'အမှတ်-၆၀၊ G-1၊ ပါရမီလမ်း၊ မရမ်းကုန်းမြို့နယ်း', 'HOSPITAL', 
+    'No-60, G-1,  Parami Road, Mayangone', 'အမှတ်-၆၀၊ G-1၊ ပါရမီလမ်း၊ မရမ်းကုန်းမြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.155802 16.849928)')
 ),
 (
     'Pinlon Hospital', 'ပင်လုံဆေးရုံ', '013581329', 
-    'No.9, Saya San Road', 'No.9, Saya San လမ်း', 'HOSPITAL', 
+    'No.9, Saya San Road', ', အမှတ် ၉၊ ဆရာစံလမ်း', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.208745 16.860846)')
 ),
 (
     'Grand Hantha Hospital', 'ဂရန်းဟံသာဆေးရုံ', '012317600', 
-    'No (3), Corner of Nar Nat Taw Street and Kyee Myin Daing, Kan Nar Road, Yangon', 'No (3), Corner of Nar Nat Taw လမ်း and Kyee Myin Daing, Kan Nar လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'No (3), Corner of Nar Nat Taw Street and Kyee Myin Daing, Kan Nar Road, Yangon', 'အမှတ် (၃), နာနတ်တောလမ်းနှင့်ကြည့်မြင်တိုင်လမ်းထောင့်, ကမ်းနားလမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.123294 16.821373)')
 ),
 (
     'Kan Thar Yar Hospital', 'ကံသာယာဆေးရုံ', '01505284', 
-    '87 Pyay Rd, Yangon', '87 Pyay လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    '87 Pyay Rd, Yangon', '၈၇ ပြည်လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.137153 16.842162)')
 ),
 (
     'Sakura Hospital', 'ဆာကူရာဆေးရုံ', '017512668', 
-    'No.23, Shin Saw Pu Road, Sanchaung Township', 'No.23, Shin Saw Pu လမ်း, စမ်းချောင်း မြို့နယ်', 'HOSPITAL', 
+    'No.23, Shin Saw Pu Road, Sanchaung Township', 'အမှတ် ၂၃၊ ရှင်စောပုလမ်း, စမ်းချောင်း မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.130535 16.79631)')
 ),
 (
     'SSC Hospital', 'ရွှေဂုံတိုင်အထူးကုဆေးရုံ', '01541457', 
-    'No.7, Shwe Gon Daing St, Bahan Township', 'No.7, Shwe Gon Daing လမ်း, ဗဟန်း မြို့နယ်', 'HOSPITAL', 
+    'No.7, Shwe Gon Daing St, Bahan Township', 'အမှတ် ၇၊ ရွှေဂုံတိုင်လမ်း, ဗဟန်း မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.165681 16.8109)')
 ),
 (
     'Jivitadana Sangha Hospital', 'ဇီဝိတဒါန သံဃာ့ဆေးရုံကြီး', '01557733', 
-    'Kaba Aye Pagoda Road, Bahan Township', 'Kaba Aye Pagoda လမ်း, ဗဟန်း မြို့နယ်', 'HOSPITAL', 
+    'Kaba Aye Pagoda Road, Bahan Township', 'ကမ္ဘာအေးဘုရားလမ်း, ဗဟန်း မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.156345 16.803049)')
 ),
 (
-    'Okkala Hospital', 'အိုက္ကလာဆေးရုံ', '014706622', 
-    'No.137/D, Thudhamma Road, South Okkalapa', 'No.137/D, Thudhamma လမ်း, တောင်ဥက္ကလာပ', 'HOSPITAL', 
+    'Okkala Hospital', 'ဥက္ကလာဆေးရုံ', '014706622', 
+    'No.137/D, Thudhamma Road, South Okkalapa', 'အမှတ် ၁၃၇/D၊ သုဓမ္မလမ်း, တောင်ဥက္ကလာပ', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.155001 16.884979)')
 ),
 (
     'Ar Yu Hospital', 'အာယုအင်တာနေရှင်နယ်ဆေးရုံ', '019376200', 
-    'R57G+59R, 400 Kyaik Ka San Rd, Yangon', 'R57G+59R, 400 Kyaik Ka San လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'R57G+59R, 400 Kyaik Ka San Rd, Yangon', 'R57G+59R, ၄၀၀ ကျိုက်ကစံလမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.175777 16.813033)')
 ),
 (
-    'Sabal Specialist Clinic', 'စံပယ်', '09677756737', 
-    '90 Hledan Street, Yangon', '90 Hledan လမ်း, ရန်ကုန်', 'CLINIC', 
+    'Sabal Specialist Clinic', 'စံပယ်အထူးကုဆေးခန်း', '09677756737', 
+    '90 Hledan Street, Yangon', '၉၀ လှည်းတန်း လမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.143683 16.776809)')
 ),
 (
     'Marlar Myaing Specialist Clinic', 'မာလာမြိုင် အထူးကုဆေးခန်း', '09765111729', 
-    'No.6, Marlar Myaing 4th St,16th Ward,Hlaing Township, Yangon', 'No.6, Marlar Myaing 4th လမ်း,16th ရပ်ကွက်,လှိုင် မြို့နယ်, ရန်ကုန်', 'CLINIC', 
+    'No.6, Marlar Myaing 4th St,16th Ward,Hlaing Township, Yangon', 'အမှတ် ၆၊ မာလာမြိုင် ၄ လမ်း,၁၆ ရပ်ကွက်,လှိုင် မြို့နယ်, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.120922 16.856918)')
 ),
 (
     'Shwe Taw Win Hospital', 'ရွှေတော်ဝင်ဆေးရုံ', '09799992342', 
-    '10/B U Wisara Road, Yangon', '10/B U Wisara လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    '10/B U Wisara Road, Yangon', '၁၀/ဘီ၊ ဦးဝိစာရလမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.172762 16.878087)')
 ),
 (
     'No. (2) Military Hospital (500 Bedded)', 'အမှတ်(၂) တပ်မ​တော်ဆေးရုံ (ကုတင်၅၀၀)', '', 
-    'Zay Street, Yangon Dagon Township', 'Zay လမ်း, ရန်ကုန် ဒဂုံ မြို့နယ်', 'HOSPITAL', 
+    'Zay Street, Yangon Dagon Township', 'ဇေ လမ်း, ရန်ကုန် ဒဂုံ မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.152483 16.78954)')
 ),
 (
     'Shin Par Gu Hospital', 'သျှင်ပါကူဆေးရုံ', '01548779', 
-    '71, 73 Banyar Dala Rd, Yangon', '71, 73 Banyar Dala လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    '71, 73 Banyar Dala Rd, Yangon', '၇၁၊ ၇၃ ဗညားဒလ လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.171726 16.806627)')
 ),
 (
     'Aung Yadana Hospital', 'အောင်ရတနာဆေးရုံ', '09880443355', 
-    'No. 5/24, Thirigon Estate, Waizayantar Road, 16 2 Block, Yangon', 'No. 5/24, Thirigon Estate, Waizayantar လမ်း, 16 2 Block, ရန်ကုန်', 'HOSPITAL', 
+    'No. 5/24, Thirigon Estate, Waizayantar Road, 16 2 Block, Yangon', 'အမှတ် ၅/၂၄, သီရိဂုဏ်အိမ်ရာ , ဝေဇယန္တာလမ်း, ၁၆-၂ ဘလောက်, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.179402 16.832502)')
 ),
 (
     'THUKHAGABAR HOSPITAL', 'သုခကမ္ဘာ ဆေးရုံ', '01500100', 
-    'R4MJ+577 San Yeik Nyein, 6th Street, Yangon', 'R4MJ+577 San Yeik Nyein, 6th လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    ' San Yeik Nyein, 6th Street, Yangon', ' စံရိပ်ငြိမ်း၊ ၆ လမ်း လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.130616 16.833271)')
 ),
 (
     'National Rehabilitation Hospital', 'အမျိုးသားပြန်လည်သန်စွမ်းရေးဆေးရုံ', '01660898', 
-    'Min Dhama Road , Kyaik Waing Pagoda Road ထောင့်Ward (3), Mayangone Township', 'Min Dhama လမ်း , Kyaik Waing Pagoda လမ်း ထောင့်ရပ်ကွက် (3), မရမ်းကုန်း မြို့နယ်', 'HOSPITAL', 
+    'Min Dhama Road , Kyaik Waing Pagoda Road ထောင့်Ward (3), Mayangone Township', 'မင်းဓမ္မ လမ်း , ကျိုက်ဝိုင်းဘုရား လမ်း ထောင့်ရပ်ကွက် (၃), မရမ်းကုန်း မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.131649 16.865726)')
 ),
 (
     'KWEKABAW Hospital', 'ကွယ်ကဘောဆေးရုံ', '09253132574', 
-    'အမှတ် 144၊ မင်းကြီးလမ်း၊ ရွာမ (အရှေ့) ရပ်ကွက်၊ အင်းစိန်မြို့နယ်', 'အမှတ် 144၊ မင်းကြီးလမ်း၊ ရွာမ (အရှေ့) ရပ်ကွက်၊ အင်းစိန်မြို့နယ်', 'HOSPITAL', 
+    'အမှတ် 144၊ မင်းကြီးလမ်း၊ ရွာမ (အရှေ့) ရပ်ကွက်၊ အင်းစိန်မြို့နယ်', 'အမှတ် ၁၄၄၊ မင်းကြီးလမ်း၊ ရွာမ (အရှေ့) ရပ်ကွက်၊ အင်းစိန်မြို့နယ်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.105007 16.89466)')
 ),
 (
     'Bahosi Hospital', 'ဗဟိုစည်ဆေးရုံ', '012300631', 
-    'B 1/6 - 31/36 - 37/38, Bahosi Housing Complex, Wardan Street, Yangon', 'B 1/6 - 31/36 - 37/38, Bahosi Housing Complex, Wardan လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'B 1/6-31/36-37/38, Bahosi Housing Complex, Wardan Street, Yangon', 'B ၁/၆-၃၁/၃၆-၃၇/၃၈, ဗဟိုစည်အိမ်ရာအစုအဝေး, ဝါးတန်းလမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.14089 16.779212)')
 ),
 (
     'Aung Chan Tha Specialist Clinic', 'အောင်ချမ်းသာအထူးကုဆေးခန်း', '09753113161', 
-    'Aung Chan Thar, Yangon 11021', 'Aung Chan Thar, ရန်ကုန် 11021', 'CLINIC', 
+    'Aung Chan Thar, Yangon ', 'အောင်ချမ်းသာ, ရန်ကုန် ', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.120257 16.977764)')
 ),
 (
     'Taw Win 24Hr Clinic', 'တော်ဝင် ၂၄နာရီ ဆေးခန်း', '09774411358', 
-    'No.111 Ground floor, Baho Rd, Yangon 11041', 'No.111 Ground floor, Baho လမ်း, ရန်ကုန် 11041', 'CLINIC', 
+    'No.111 Ground floor, Baho Rd, Yangon ', 'အမှတ် ၁၁၁၊ မြေညီထပ်, ဗဟို လမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.125334 16.825712)')
 ),
 (
     'Thukha Specialist Clinic', 'သုခအထူးကုဆေးခန်း', '0973017408', 
-    'No. 83, 84 Insein Rd, Yangon', 'No. 83, 84 Insein လမ်း, ရန်ကုန်', 'CLINIC', 
+    'No. 83, 84 Insein Rd, Yangon', 'အမှတ် ၈၃၊၈၄ အင်းစိန် လမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.126452 16.840414)')
 ),
 (
     'KBC Hospital', 'ကေဘီစီ ဆေးရုံ', '01644943', 
-    'Seminary Hill, Insein Rd, Yangon', 'Seminary Hill, Insein လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'Seminary Hill, Insein Rd, Yangon', 'Seminary Hill, အင်းစိန် လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.114277 16.881959)')
 ),
 (
@@ -255,38 +255,33 @@ INSERT INTO medical_facilities (name_en, name_mm, phone, address_en, address_mm,
 ),
 (
     'Yuzana Clinic', 'ယုဇနဆေးခန်း', '01526074', 
-    'No 45, Hlaing Bu Tar Yon St, Yangon', 'No 45, Hlaing Bu Tar Yon လမ်း, ရန်ကုန်', 'CLINIC', 
+    'No 45, Hlaing Bu Tar Yon St, Yangon', 'အမှတ် ၄၅၊ လှိုင်ဘူတာရုံလမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.121843 16.836922)')
 ),
 (
     'Shwe Baho Hospital', 'ရွှေဗဟိုဆေးရုံကြီး', '09263683904', 
-    '26 Tha Mein Ba Yan Rd, Yangon', '26 Tha Mein Ba Yan လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    '26 Tha Mein Ba Yan Rd, Yangon', '၂၆ သမိန်ဗရမ်း လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.177181 16.809975)')
 ),
 (
     'Myittar Hospital', 'မေတ္တာဆေးရုံ', '09262840600', 
-    'R5VP+JHC, Myittar Rd, Yangon', 'R5VP+JHC, Myittar လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'Myittar Rd, Yangon', 'မေတ္တာ လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.186613 16.845674)')
 ),
 (
     'Aye Meitta Clinic', 'အေးမေတ္တာဆေးခန်း', '09450289543', 
-    'Dhama Yarzar St, Yangon', 'Dhama Yarzar လမ်း, ရန်ကုန်', 'CLINIC', 
+    'Dhama Yarzar St, Yangon', 'ဓမ္မရာဇာ လမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.18345 16.846074)')
 ),
 (
     'Shwe Pyi Thar Specialist Clinic', 'ရွှေပြည်သာအထူးကုဆေးခန်း', '0973033027', 
-    'No. 732 4th St, Yangon', 'No. 732 4th လမ်း, ရန်ကုန်', 'CLINIC', 
+    'No. 732 4th St, Yangon', 'အမှတ် ၇၃၂ ၄လမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.11291 16.861818)')
 ),
 (
     'Sanpya Specialist Clinic', 'စံပြအထူးကုဆေးခန်း', '09780981106', 
-    'သမိန္ဗရမ္းလမ္း, Yangon 11211', 'သမိန္ဗရမ္းလမ္း, ရန်ကုန် 11211', 'CLINIC', 
+    'Tha Mein Ba Yan, Yangon', 'သမိန်ဗရမ်း, ရန်ကုန်', 'CLINIC', 
     ST_GeographyFromText('SRID=4326;POINT(96.174445 16.812384)')
-),
-(
-    'Aung Yadana Hospital', 'အောင်ရတနာ ဆေးရုံ', '09880443355', 
-    'No. 5/24, Thirigon Estate, Waizayantar Road, 16 2 Block, Yangon', 'No. 5/24, Thirigon Estate, Waizayantar လမ်း, 16 2 Block, ရန်ကုန်', 'HOSPITAL', 
-    ST_GeographyFromText('SRID=4326;POINT(96.179364 16.832706)')
 ),
 (
     'Moe Myittar Hospital', 'မိုးမေတ္တာ ဆေးရုံ', '01523564', 
@@ -295,12 +290,12 @@ INSERT INTO medical_facilities (name_en, name_mm, phone, address_en, address_mm,
 ),
 (
     'Academy Hospital', 'အကယ်ဒမီ ဆေးရုံ', '01212890', 
-    'No. 335 Lower Kyeemyindaing Rd, Yangon', 'No. 335 အောက်ကြည့်မြင်တိုင်လမ်း, ရန်ကုန်', 'HOSPITAL', 
+    'No. 335 Lower Kyeemyindaing Rd, Yangon', 'အမှတ် ၃၃၅ အောက်ကြည့်မြင်တိုင်လမ်း, ရန်ကုန်', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.127952 16.790417)')
 ),
 (
     'Moe Thee Hospital', 'မိုးသီး ဆေးရုံ', '095000948', 
-    '238/239 Yamonnar Rd, Yangon ', '238/239 Yamonnar လမ်း, ရန်ကုန် ', 'HOSPITAL', 
+    '238/239 Yamonnar Rd, Yangon ', '၂၃၈/၂၃၉ ယမုံနာ လမ်း, ရန်ကုန် ', 'HOSPITAL', 
     ST_GeographyFromText('SRID=4326;POINT(96.191577 16.779589)')
 ),
 (

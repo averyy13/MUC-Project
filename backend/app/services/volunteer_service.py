@@ -2,6 +2,9 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.volunteer_repository import VolunteerRepository
 from app.schemas.location import LocationUpdateRequest
+from app.repositories.emergency_request_repository import EmergencyRequestRepository
+from app.repositories.volunteer_assignment_repository import VolunteerAssignmentRepository
+from app.services.emergency_request_service import EmergencyRequestService
 
 class VolunteerService:
     @staticmethod
@@ -19,15 +22,10 @@ class VolunteerService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Volunteer not found",
             )
-        home_location = await VolunteerRepository.get_home_location(
-            db,
-            volunteer.id,
-        )
-        current_location = await VolunteerRepository.get_current_location(
-            db,
-            volunteer.id,
-        )
-  
+        home_location = await VolunteerRepository.get_home_location(db, volunteer.id)
+        current_location = await VolunteerRepository.get_current_location(db, volunteer.id)
+        completed_rescues = await VolunteerAssignmentRepository.count_completed_for_volunteer(db, volunteer.id)
+        
         return {
             "volunteer_id": volunteer.id,
             "user_id": volunteer.user.id,
@@ -41,6 +39,7 @@ class VolunteerService:
             "certificate_url": volunteer.certificate_url,
             "home_location": home_location,
             "current_location": current_location,
+            "completed_rescues": completed_rescues,
         }
 
     @staticmethod
@@ -153,3 +152,32 @@ class VolunteerService:
             "message": "Availability updated successfully.",
             "availability": availability,
         }
+        
+    @staticmethod
+    async def get_active_emergency_for_volunteer(
+        db: AsyncSession,
+        user_id,
+    ):
+        volunteer = await VolunteerRepository.get_by_user_id(
+            db,
+            user_id,
+        )
+    
+        if volunteer is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Volunteer not found",
+            )
+    
+        assignment = await VolunteerAssignmentRepository.get_active_for_volunteer(
+            db,
+            volunteer.id,
+        )
+    
+        if assignment is None:
+            return None
+    
+        return await EmergencyRequestService.get_emergency_status(
+            db,
+            assignment.request_id,
+        )

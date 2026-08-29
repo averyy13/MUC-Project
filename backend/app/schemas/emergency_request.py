@@ -30,12 +30,14 @@ class AssignedVolunteerResponse(BaseModel):
     id: UUID
     name: str
     phone: str
+    assignment_status: str | None = None
     location: AssignedVolunteerLocationResponse | None = None
 
 
 class EmergencyStatusResponse(BaseModel):
     emergency_id: UUID
     status: str
+    assignment_status: str | None = None    
     category_id: int
     category_name_en: str
     category_name_mm: str

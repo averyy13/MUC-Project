@@ -1,9 +1,9 @@
 from sqlalchemy import select, text,update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-
+from sqlalchemy import func, select
 from app.models.volunteer import Volunteer
-
+from app.models.enums import AssignmentStatus
 
 class VolunteerRepository:
 
@@ -114,3 +114,5 @@ class VolunteerRepository:
         )
 
         await db.commit()
+        
+   

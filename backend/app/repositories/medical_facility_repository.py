@@ -1,12 +1,25 @@
 from sqlalchemy import select, func, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from geoalchemy2 import Geography, Geometry
-
+from uuid import UUID
 from app.models.medical_facility import MedicalFacility
-
 
 class MedicalFacilityRepository:
 
+    @staticmethod
+    async def get_by_id(
+        db: AsyncSession,
+        facility_id: UUID,
+    ) -> MedicalFacility | None:
+
+        result = await db.execute(
+            select(MedicalFacility).where(
+                MedicalFacility.id == facility_id,
+                MedicalFacility.is_active.is_(True),
+            )
+        )
+
+        return result.scalar_one_or_none()
     @staticmethod
     async def get_nearby_facilities(
         db: AsyncSession,
@@ -52,9 +65,6 @@ class MedicalFacilityRepository:
         latitude_result = func.ST_Y(location_geometry)
         longitude_result = func.ST_X(location_geometry)
 
-        # ---------------------------------------------------------
-        # Query
-        # ---------------------------------------------------------
         query = (
             select(
                 MedicalFacility,
@@ -70,5 +80,35 @@ class MedicalFacilityRepository:
         )
 
         result = await db.execute(query)
-
         return result.all()
+
+
+    @staticmethod
+    async def get_by_id_with_coordinates(
+        db: AsyncSession,
+        facility_id: UUID,
+    ):
+        location_geometry = cast(
+            MedicalFacility.location,
+            Geometry("POINT", srid=4326),
+        )
+
+        latitude_result = func.ST_Y(location_geometry)
+        longitude_result = func.ST_X(location_geometry)
+
+        query = (
+            select(
+                MedicalFacility,
+                latitude_result.label("latitude"),
+                longitude_result.label("longitude"),
+            )
+            .where(
+                MedicalFacility.id == facility_id,
+                MedicalFacility.is_active.is_(True),
+            )
+        )
+
+        result = await db.execute(query)
+
+        return result.one_or_none()
+

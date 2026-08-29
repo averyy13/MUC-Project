@@ -14,6 +14,7 @@ from app.api.v1.routers.emergency_categories import router as emergency_categori
 from app.api.v1.routers.facilities import router as facilities_router
 from app.api.v1.routers.emergency_contacts import router as emergency_contacts_router
 from app.api.v1.routers.device_tokens import router as device_tokens_router
+from app.api.v1.routers.chatbot import router as chatbot_router
 from app.core.firebase import initialize_firebase
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -96,5 +97,9 @@ app.include_router(
 )
 app.include_router(
     device_tokens_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    chatbot_router,
     prefix="/api/v1",
 )

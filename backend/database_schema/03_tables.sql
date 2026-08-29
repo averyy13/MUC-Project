@@ -22,7 +22,7 @@ CREATE TABLE volunteers (
     address TEXT NOT NULL,
     home_location GEOGRAPHY(Point,4326), -- PostGIS Spatial Point (Home base)
     certificate_url TEXT,
-    approval_status approval_status NOT NULL DEFAULT 'PENDING',
+    approval_status NOT NULL DEFAULT 'PENDING',
     availability BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -113,6 +113,7 @@ CREATE TABLE emergency_requests (
     accepted_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    -- assignment_status VARCHAR(50);,
     CONSTRAINT fk_request_category
         FOREIGN KEY (category_id)
         REFERENCES emergency_categories(id)

@@ -10,14 +10,12 @@ class ApprovalStatus(str, Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
 
-
 class EmergencyStatus(str, Enum):
     SEARCHING = "SEARCHING"
     ASSIGNED = "ASSIGNED"
     VOLUNTEER_EN_ROUTE = "VOLUNTEER_EN_ROUTE"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
-
 
 class AssignmentStatus(str, Enum):
     PENDING = "PENDING"
@@ -27,7 +25,6 @@ class AssignmentStatus(str, Enum):
     CANCELLED = "CANCELLED"
     ARRIVED = "ARRIVED"
     COMPLETED = "COMPLETED"
-
 
 class OrganizationType(str, Enum):
     AMBULANCE = "AMBULANCE"

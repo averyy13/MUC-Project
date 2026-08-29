@@ -1,11 +1,12 @@
 from sqlalchemy import select, func, cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from geoalchemy2 import Geography, Geometry  # <-- Added Geometry here
-
+from uuid import UUID
+from sqlalchemy import select, func, cast
+from geoalchemy2 import Geometry
 from app.models.emergency_contact import EmergencyContact
 
 class EmergencyContactRepository:
-
     @staticmethod
     async def get_nearby_rescue_teams(
         db: AsyncSession,
@@ -64,5 +65,31 @@ class EmergencyContactRepository:
         )
 
         result = await db.execute(query)
-
         return result.all()
+    
+    @staticmethod
+    async def get_by_id_with_coordinates(
+        db: AsyncSession,
+        contact_id: UUID,
+        ):
+        location_geometry = cast(
+            EmergencyContact.location,
+            Geometry("POINT", srid=4326),
+        )
+
+        latitude_result = func.ST_Y(location_geometry)
+        longitude_result = func.ST_X(location_geometry)
+
+        query = (
+            select(
+                EmergencyContact,
+                latitude_result.label("latitude"),
+                longitude_result.label("longitude"),
+            )
+            .where(
+                EmergencyContact.id == contact_id,
+                EmergencyContact.is_active.is_(True),
+            )
+        )
+        result = await db.execute(query)
+        return result.one_or_none()

@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
 
-
     # PostgreSQL
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
@@ -18,12 +17,15 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
 
-
     # Security
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Google API
+    GOOGLE_ROUTES_API_KEY: str
+    OPENROUTER_API_KEY: str
+    OPENROUTER_MODEL: str = "google/gemma-4-31b-it:free"
 
     # Firebase
     FCM_PROJECT_ID: str | None = None
@@ -55,7 +57,6 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings():
     return Settings()
-
 
 settings = get_settings()
 

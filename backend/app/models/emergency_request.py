@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sqlalchemy import Enum as SQLEnum
-from app.models.enums import EmergencyStatus
+from app.models.enums import  EmergencyStatus
 import uuid
 from datetime import datetime
 from geoalchemy2 import Geography
@@ -59,7 +59,7 @@ class EmergencyRequest(Base):
         ForeignKey("volunteers.id"),
         nullable=True,
     )
-
+    
     assigned_rescue_contact_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("emergency_contacts.id"),
@@ -83,7 +83,6 @@ class EmergencyRequest(Base):
     )
 
     # Relationships
-
     category = relationship(
         "EmergencyCategory",
         back_populates="emergency_requests",
