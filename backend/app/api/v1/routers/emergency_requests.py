@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.schemas.emergency_assignment import AcceptEmergencyResponse
 from app.db.session import get_db
-from app.schemas.emergency_request import EmergencyStatusResponse, SOSRequest, SOSResponse
+from app.schemas.emergency_request import EmergencyStatusResponse, SOSRequest, SOSResponse, EmergencyActionResponse
 from app.services.emergency_request_service import EmergencyRequestService
 from app.core.dependencies import require_volunteer
 from app.models.user import User
@@ -93,4 +93,17 @@ async def complete_rescue(
         db=db,
         emergency_id=emergency_id,
         user_id=current_user.id,
+    )
+    
+@router.post(
+    "/{emergency_id}/cancel",
+    response_model=EmergencyActionResponse,
+)
+async def cancel_emergency(
+    emergency_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    return await EmergencyRequestService.cancel_emergency(
+        db=db,
+        emergency_id=emergency_id,
     )

@@ -16,15 +16,34 @@ from app.repositories.volunteer_assignment_repository import VolunteerAssignment
 from app.services.fcm_service import FCMService
 from app.services.google_routes_service import GoogleRoutesService
 from app import db
+from app.repositories.requester_device_token_repository import RequesterDeviceTokenRepository
 
 class EmergencyRequestService:
 
     @staticmethod
     async def create_sos(db: AsyncSession, data, requester_id=None):
+        if data.device_id is not None:
+            existing_emergency = (
+                await EmergencyRequestRepository
+                .get_active_for_device(
+                    db,
+                    data.device_id,
+                )
+            )
+            if existing_emergency is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail={
+                        "message": "You already have an active emergency.",
+                        "emergency_id": str(
+                            existing_emergency.id
+                        ),
+                    },
+                )
         point = WKTElement(f"POINT({data.longitude} {data.latitude})", srid=4326)
         emergency = EmergencyRequest(
             category_id=data.category_id, requester_id=requester_id, 
-            description=data.description, location=point
+            device_id=data.device_id,description=data.description, location=point
         )
         await EmergencyRequestRepository.create(db, emergency)
 
@@ -229,42 +248,50 @@ class EmergencyRequestService:
         }
         
     @staticmethod
-    async def mark_arrived(db: AsyncSession, emergency_id: UUID, user_id):
-        volunteer = await VolunteerRepository.get_by_user_id(db, user_id)
-        if volunteer is None:
-            raise HTTPException(status_code=404, detail="Volunteer not found")
-    
-        emergency = await EmergencyRequestRepository.get_by_id(db, emergency_id)
-        if emergency is None:
-            raise HTTPException(status_code=404, detail="Emergency request not found")
-        if emergency.status != EmergencyStatus.VOLUNTEER_EN_ROUTE:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                detail=(
-                    "Volunteer cannot mark arrived while "
-                    f"emergency status is {emergency.status.value}."
-                ),
-            )
-        assignment = await VolunteerAssignmentRepository.get_for_request_and_volunteer(
-            db, emergency.id, volunteer.id
-        )
-        if assignment is None:
-            raise HTTPException(status_code=404, detail="Volunteer assignment not found")
-        if assignment.status != AssignmentStatus.ACCEPTED:
-            raise HTTPException(status_code=409, detail="Volunteer assignment is "
-                f"{assignment.status.value}, not ACCEPTED.")
+    async def mark_arrived(db: AsyncSession,emergency_id: UUID,user_id,):
+        volunteer = await VolunteerRepository.get_by_user_id( db,user_id,)
 
-        await VolunteerAssignmentRepository.mark_arrived(db, assignment)
-        # await EmergencyRequestRepository.mark_arrived(db=db,emergency=emergency,volunteer_id=volunteer.id)
+        if volunteer is None:
+            raise HTTPException(status_code=404, detail="Volunteer not found",)
+
+        emergency = await EmergencyRequestRepository.get_by_id(db,emergency_id,)
+
+        if emergency is None:
+            raise HTTPException(status_code=404,detail="Emergency request not found",)
+        await EmergencyRequestRepository.mark_arrived( db=db,emergency=emergency,volunteer_id=volunteer.id,)
         await db.commit()
-    
+
+        # Notify anonymous requester.
+        if emergency.device_id is not None:
+
+            requester_token = (
+                await RequesterDeviceTokenRepository.get_by_device_id(db,emergency.device_id, )
+            )
+
+            if requester_token is not None:
+
+                await FCMService.send_volunteer_arrived_notification(
+                    token=requester_token.fcm_token,
+                    emergency_id=str(emergency.id),
+                )
+
+        assignment = (
+            await VolunteerAssignmentRepository
+            .get_for_request_and_volunteer(db,emergency.id,volunteer.id,)
+        )
+
         return {
             "emergency_id": emergency.id,
             "volunteer_id": volunteer.id,
             "status": emergency.status.value,
-            "assignment_status": assignment.status.value,
+            "assignment_status": (
+                assignment.status.value
+                if assignment
+                else None
+            ),
             "message": "Volunteer has arrived.",
         }
-        
+
     @staticmethod
     async def complete_rescue(db: AsyncSession, emergency_id: UUID, user_id):
         volunteer = await VolunteerRepository.get_by_user_id(db, user_id)
@@ -318,3 +345,66 @@ class EmergencyRequestService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No active emergency found.")
 
         return await EmergencyRequestService.get_emergency_status(db, emergency.id)
+    
+    @staticmethod
+    async def cancel_emergency(
+        db: AsyncSession,
+        emergency_id: UUID,
+        requester_id: UUID | None = None,
+    ):
+        emergency = await EmergencyRequestRepository.get_by_id(
+            db,
+            emergency_id,
+        )
+
+        if emergency is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Emergency request not found.",
+            )
+
+        # Anonymous requester: caller cannot be verified through requester_id alone.
+        # For now, this method validates the emergency state. Device ownership protection will be added in Phase 3.
+
+        if emergency.status in (
+            EmergencyStatus.COMPLETED,
+            EmergencyStatus.CANCELLED,
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"Emergency cannot be cancelled "
+                    f"from status {emergency.status.value}"
+                ),
+            )
+
+        # Cancel the volunteer assignment if one exists.
+        if emergency.assigned_volunteer_id is not None:
+
+            assignment = (
+                await VolunteerAssignmentRepository
+                .get_for_request_and_volunteer(
+                    db,
+                    emergency.id,
+                    emergency.assigned_volunteer_id,
+                )
+            )
+
+            if assignment is not None:
+                await VolunteerAssignmentRepository.cancel(
+                    db,
+                    assignment,
+                )
+
+        await EmergencyRequestRepository.cancel_emergency(
+            db,
+            emergency,
+        )
+
+        await db.commit()
+
+        return {
+            "emergency_id": emergency.id,
+            "status": emergency.status.value,
+            "message": "Emergency cancelled successfully.",
+        }

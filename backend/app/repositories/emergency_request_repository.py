@@ -136,3 +136,53 @@ class EmergencyRequestRepository:
         await db.flush()
         await db.refresh(emergency)
         return emergency
+    
+    @staticmethod
+    async def cancel_emergency(
+        db: AsyncSession,
+        emergency: EmergencyRequest,
+    ):
+        if emergency.status in (
+            EmergencyStatus.COMPLETED,
+            EmergencyStatus.CANCELLED,
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"Emergency cannot be cancelled "
+                    f"from status {emergency.status.value}"
+                ),
+            )
+
+        emergency.status = EmergencyStatus.CANCELLED
+
+        await db.flush()
+        await db.refresh(emergency)
+
+        return emergency
+    
+    @staticmethod
+    async def get_active_for_device(
+        db: AsyncSession,
+        device_id: UUID,
+    ) -> EmergencyRequest | None:
+    
+        result = await db.execute(
+            select(EmergencyRequest)
+            .where(
+                EmergencyRequest.device_id == device_id,
+                EmergencyRequest.status.in_(
+                    [
+                        EmergencyStatus.SEARCHING,
+                        EmergencyStatus.ASSIGNED,
+                        EmergencyStatus.VOLUNTEER_EN_ROUTE,
+                    ]
+                ),
+            )
+            .order_by(
+                EmergencyRequest.created_at.desc()
+            )
+            .limit(1)
+        )
+    
+        return result.scalar_one_or_none()

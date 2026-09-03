@@ -105,6 +105,7 @@ CREATE TABLE emergency_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category_id INTEGER NOT NULL,
     requester_id UUID,
+    device_id UUID,
     description TEXT,
     location GEOGRAPHY(Point, 4326) NOT NULL,
     status emergency_status NOT NULL DEFAULT 'SEARCHING',
@@ -183,6 +184,18 @@ CREATE TABLE emergency_notifications (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ======================================================
+-- 12. REQUESTER DEVICE TOKENS TABLE (For Notifications to Requesters)
+-- ======================================================
+CREATE TABLE requester_device_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id UUID NOT NULL UNIQUE,
+    fcm_token TEXT NOT NULL UNIQUE,
+    platform device_platform NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 -- ======================================================
 -- AUTOMATIC TIMESTAMPTZ TRIGGERS CONFIGURATION
 -- ======================================================
@@ -202,6 +215,7 @@ CREATE TRIGGER set_timestamp_medical_facilities BEFORE UPDATE ON medical_facilit
 CREATE TRIGGER set_timestamp_emergency_requests BEFORE UPDATE ON emergency_requests FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 CREATE TRIGGER set_timestamp_current_volunteer_locations BEFORE UPDATE ON current_volunteer_locations FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 CREATE TRIGGER set_timestamp_emergency_notifications BEFORE UPDATE ON emergency_notifications FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
+CREATE TRIGGER set_timestamp_requester_device_tokens BEFORE UPDATE ON requester_device_tokens FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp();
 
 -- Verification query to list all successfully created tables
 SELECT table_name

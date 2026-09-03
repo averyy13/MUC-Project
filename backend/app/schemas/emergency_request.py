@@ -5,6 +5,7 @@ class SOSRequest(BaseModel):
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     description: str | None = None
+    device_id: UUID | None = None
 
 class RescueContactResponse(BaseModel):
     id: UUID
@@ -46,3 +47,8 @@ class EmergencyStatusResponse(BaseModel):
     longitude: float
     distance_meters: float | None = None
     assigned_volunteer: AssignedVolunteerResponse | None = None
+    
+class EmergencyActionResponse(BaseModel):
+    emergency_id: UUID
+    status: str
+    message: str

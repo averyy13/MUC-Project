@@ -65,6 +65,7 @@ CREATE INDEX idx_requests_category ON emergency_requests(category_id);
 -- Spatial index to track the patient's active emergency location point
 CREATE INDEX idx_requests_location ON emergency_requests USING GIST(location);
 
+CREATE INDEX idx_emergency_requests_device_id ON emergency_requests(device_id);
 -- ======================================================
 -- 8. VOLUNTEER ASSIGNMENTS INDEXES
 -- ======================================================

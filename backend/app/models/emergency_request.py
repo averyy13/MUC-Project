@@ -15,34 +15,24 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 class EmergencyRequest(Base):
     __tablename__ = "emergency_requests"
-
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4,
+        UUID(as_uuid=True),primary_key=True,default=uuid.uuid4,
     )
-
     category_id: Mapped[int] = mapped_column(
-        ForeignKey("emergency_categories.id"),
-        nullable=False,
+        ForeignKey("emergency_categories.id"),nullable=False,
     )
-
     requester_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id"),
-        nullable=True,
+        UUID(as_uuid=True), ForeignKey("users.id"),nullable=True,
     )
-
+    device_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), nullable=True,
+    )
     description: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
+        Text, nullable=True,
     )
-
     location: Mapped[object] = mapped_column(
-        Geography(geometry_type="POINT", srid=4326),
-        nullable=False,
+        Geography(geometry_type="POINT", srid=4326),nullable=False,
     )
-
     status: Mapped[EmergencyStatus] = mapped_column(
         SQLEnum(
             EmergencyStatus,
@@ -53,27 +43,21 @@ class EmergencyRequest(Base):
         default=EmergencyStatus.SEARCHING,
         server_default="SEARCHING",
     )
-
     assigned_volunteer_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("volunteers.id"),
         nullable=True,
     )
-    
     assigned_rescue_contact_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("emergency_contacts.id"),
         nullable=True,
     )
-
     accepted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
+        DateTime(timezone=True), nullable=True,
     )
-
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
+        DateTime(timezone=True),server_default=func.now(),
     )
 
     updated_at: Mapped[datetime] = mapped_column(
@@ -82,27 +66,19 @@ class EmergencyRequest(Base):
         onupdate=func.now(),
     )
 
-    # Relationships
     category = relationship(
-        "EmergencyCategory",
-        back_populates="emergency_requests",
+        "EmergencyCategory", back_populates="emergency_requests",
     )
-
     requester = relationship(
-        "User",
-        back_populates="emergency_requests",
+        "User", back_populates="emergency_requests",
     )
-
     assigned_volunteer = relationship(
-        "Volunteer",
-        foreign_keys=[assigned_volunteer_id],
+        "Volunteer", foreign_keys=[assigned_volunteer_id],
     )
 
     assigned_rescue_contact = relationship(
-        "EmergencyContact",
-        foreign_keys=[assigned_rescue_contact_id],
+        "EmergencyContact", foreign_keys=[assigned_rescue_contact_id],
     )
-    
     notifications = relationship(
         "EmergencyNotification",
         back_populates="emergency_request",

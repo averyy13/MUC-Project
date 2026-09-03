@@ -107,5 +107,22 @@ class VolunteerAssignmentRepository:
         )
         return result.scalar_one()
     
+    @staticmethod
+    async def cancel(
+        db: AsyncSession,
+        assignment: VolunteerAssignment,
+    ) -> VolunteerAssignment:
+    
+        if assignment.status in (
+            AssignmentStatus.COMPLETED,
+            AssignmentStatus.CANCELLED,
+        ):
+            return assignment
+    
+        assignment.status = AssignmentStatus.CANCELLED
+    
+        await db.flush()
+    
+        return assignment
     
     
