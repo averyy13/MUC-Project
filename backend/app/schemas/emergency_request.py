@@ -47,6 +47,13 @@ class EmergencyStatusResponse(BaseModel):
     longitude: float
     distance_meters: float | None = None
     assigned_volunteer: AssignedVolunteerResponse | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+    notified_at: str | None = None
+    accepted_at: str | None = None
+    arrived_at: str | None = None
+    completed_at: str | None = None
+    location_updated_at: str | None = None
     
 class EmergencyActionResponse(BaseModel):
     emergency_id: UUID

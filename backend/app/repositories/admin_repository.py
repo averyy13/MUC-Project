@@ -13,14 +13,31 @@ class AdminRepository:
         db: AsyncSession,
         status: ApprovalStatus
     ):
+        from app.models.volunteer_assignment import VolunteerAssignment
+        from sqlalchemy import func
 
-        result = await db.execute(
-            select(Volunteer)
+        rescue_counts = (
+            select(
+                VolunteerAssignment.volunteer_id,
+                func.count(func.distinct(VolunteerAssignment.request_id)).label("completed_rescues")
+            )
+            .where(VolunteerAssignment.completed_at.is_not(None))
+            .group_by(VolunteerAssignment.volunteer_id)
+            .subquery()
+        )
+
+        query = (
+            select(
+                Volunteer,
+                func.coalesce(rescue_counts.c.completed_rescues, 0).label("completed_rescues")
+            )
             .options(selectinload(Volunteer.user))
+            .outerjoin(rescue_counts, Volunteer.id == rescue_counts.c.volunteer_id)
             .where(Volunteer.approval_status == status)
         )
 
-        return result.scalars().all()
+        result = await db.execute(query)
+        return result.all()
 
 
     @staticmethod

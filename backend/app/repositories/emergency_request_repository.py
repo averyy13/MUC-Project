@@ -52,6 +52,7 @@ class EmergencyRequestRepository:
                 CurrentVolunteerLocation.speed.label("volunteer_speed"),
                 CurrentVolunteerLocation.heading.label("volunteer_heading"),
                 func.ST_Distance(EmergencyRequest.location, CurrentVolunteerLocation.location).label("distance_meters"),
+                CurrentVolunteerLocation.updated_at.label("location_updated_at"),
             )
             .outerjoin(Volunteer, EmergencyRequest.assigned_volunteer_id == Volunteer.id)
             .outerjoin(CurrentVolunteerLocation, Volunteer.id == CurrentVolunteerLocation.volunteer_id)

@@ -138,7 +138,7 @@ class EmergencyRequestService:
         result = await EmergencyRequestRepository.get_status_with_volunteer(db, emergency_id)
         if result is None:
             raise HTTPException(status_code=404, detail="Emergency request not found")
-        (emergency, vol_lat, vol_lon, vol_speed, vol_heading, distance_meters) = result
+        (emergency, vol_lat, vol_lon, vol_speed, vol_heading, distance_meters, location_updated_at) = result
 
         location_result = await db.execute(
             text("SELECT ST_Y(location::geometry) AS latitude, ST_X(location::geometry) AS longitude FROM emergency_requests WHERE id = :emergency_id"),
@@ -183,6 +183,13 @@ class EmergencyRequestService:
             "longitude": float(location["longitude"]) if location else 0.0,
             "distance_meters": float(distance_meters) if distance_meters is not None else None,
             "assigned_volunteer": assigned_volunteer,
+            "created_at": emergency.created_at.isoformat() if emergency.created_at else None,
+            "updated_at": emergency.updated_at.isoformat() if emergency.updated_at else None,
+            "notified_at": assignment.notified_at.isoformat() if assignment and assignment.notified_at else None,
+            "accepted_at": assignment.accepted_at.isoformat() if assignment and assignment.accepted_at else None,
+            "arrived_at": assignment.arrived_at.isoformat() if assignment and assignment.arrived_at else None,
+            "completed_at": assignment.completed_at.isoformat() if assignment and assignment.completed_at else None,
+            "location_updated_at": location_updated_at.isoformat() if location_updated_at else None,
         }
         
     @staticmethod

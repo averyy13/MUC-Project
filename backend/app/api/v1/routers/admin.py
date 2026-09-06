@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.dependencies import require_admin
 from app.db.session import get_db
@@ -47,3 +47,32 @@ async def reject_volunteer(
     current_user: User = Depends(require_admin),
 ):
     return await AdminService.reject(db, volunteer_id)
+
+@router.get("/dashboard-stats")
+async def dashboard_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.get_dashboard_stats(db)
+
+@router.get("/emergencies")
+async def list_emergencies(
+    status: str | None = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.list_emergencies(db, status)
+
+@router.get("/facilities")
+async def list_facilities(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.list_facilities(db)
+
+@router.get("/emergency-contacts")
+async def list_emergency_contacts(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.list_emergency_contacts(db)
