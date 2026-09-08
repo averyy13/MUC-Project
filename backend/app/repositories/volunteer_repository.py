@@ -6,7 +6,6 @@ from app.models.volunteer import Volunteer
 from app.models.enums import AssignmentStatus
 
 class VolunteerRepository:
-
     @staticmethod
     async def create_volunteer(db: AsyncSession, volunteer: Volunteer):
         db.add(volunteer)
@@ -44,26 +43,16 @@ class VolunteerRepository:
         await db.commit()
 
     @staticmethod
-    async def update_current_location(
-        db: AsyncSession,
-        volunteer_id,
-        latitude: float,
-        longitude: float,
-    ):
+    async def update_current_location(db: AsyncSession, volunteer_id, latitude: float, longitude: float, speed: float | None = None, heading: float | None = None):
         await db.execute(
-            text(
-                "INSERT INTO current_volunteer_locations (volunteer_id, location, updated_at) "
-                "VALUES (:volunteer_id, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography, NOW()) "
-                "ON CONFLICT (volunteer_id) DO UPDATE SET location = EXCLUDED.location, updated_at = NOW()"
-            ),
-            {
-                "volunteer_id": volunteer_id,
-                "latitude": latitude,
-                "longitude": longitude,
-            },
+            text("""
+                INSERT INTO current_volunteer_locations (volunteer_id, location, speed, heading, updated_at)
+                VALUES (:volunteer_id, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography, :speed, :heading, NOW())
+                ON CONFLICT (volunteer_id) DO UPDATE SET 
+                location = EXCLUDED.location, speed = EXCLUDED.speed, heading = EXCLUDED.heading, updated_at = NOW()
+            """),
+            {"volunteer_id": volunteer_id, "latitude": latitude, "longitude": longitude, "speed": speed, "heading": heading}
         )
-
-
     @staticmethod
     async def get_home_location(db, volunteer_id):
         result = await db.execute(

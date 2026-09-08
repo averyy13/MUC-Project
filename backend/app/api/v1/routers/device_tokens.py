@@ -13,7 +13,7 @@ from app.services.device_token_service import (
     DeviceTokenService,
 )
 from app.core.dependencies import require_volunteer
-
+from app.schemas.device_token import DeviceTokenRegisterRequest, DeviceTokenDeleteRequest
 
 router = APIRouter(
     prefix="/volunteers/me",
@@ -49,3 +49,34 @@ async def register_device_token(
         volunteer_id=volunteer.id,
         data=data,
     )
+
+    
+@router.delete("/device-token")
+async def delete_device_token(
+    fcm_token: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_volunteer),
+):
+    result = await db.execute(
+        select(Volunteer).where(
+            Volunteer.user_id == current_user.id
+        )
+    )
+
+    volunteer = result.scalar_one_or_none()
+
+    if volunteer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Volunteer profile not found",
+        )
+
+    await DeviceTokenService.remove_token(
+        db=db,
+        volunteer_id=volunteer.id,
+        fcm_token=fcm_token,
+    )
+
+    return {
+        "message": "Volunteer FCM token removed successfully."
+    }

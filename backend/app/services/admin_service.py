@@ -197,26 +197,42 @@ class AdminService:
         
         from sqlalchemy import select, func
         from app.models.emergency_request import EmergencyRequest
+        from app.models.enums import EmergencyStatus
         
-        # We need to extract the date from created_at
-        # Assuming postgresql timezone mapping, but func.date() works in SQLAlchemy for postgres.
-        # However, to avoid time zone issues and make it robust, we can cast to date.
-        query = (
+        base_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Total Requests by created_at
+        total_query = (
             select(
                 func.date(EmergencyRequest.created_at).label('day'),
                 func.count(EmergencyRequest.id).label('count')
             )
-            .where(EmergencyRequest.created_at >= start_date.replace(hour=0, minute=0, second=0, microsecond=0))
+            .where(EmergencyRequest.created_at >= base_date)
             .group_by(func.date(EmergencyRequest.created_at))
-            .order_by(func.date(EmergencyRequest.created_at))
         )
-        result = await db.execute(query)
-        rows = result.all()
+        total_result = await db.execute(total_query)
         
-        data = {}
-        for row in rows:
+        total_data = {}
+        for row in total_result.all():
             if row.day:
-                data[row.day.strftime('%Y-%m-%d')] = row.count
+                total_data[row.day.strftime('%Y-%m-%d')] = row.count
+
+        # Completed Rescues by updated_at
+        completed_query = (
+            select(
+                func.date(EmergencyRequest.updated_at).label('day'),
+                func.count(EmergencyRequest.id).label('count')
+            )
+            .where(EmergencyRequest.status == EmergencyStatus.COMPLETED)
+            .where(EmergencyRequest.updated_at >= base_date)
+            .group_by(func.date(EmergencyRequest.updated_at))
+        )
+        completed_result = await db.execute(completed_query)
+        
+        completed_data = {}
+        for row in completed_result.all():
+            if row.day:
+                completed_data[row.day.strftime('%Y-%m-%d')] = row.count
             
         days = (now.date() - start_date.date()).days
         result_list = []
@@ -227,23 +243,33 @@ class AdminService:
             result_list.append({
                 "date": ds,
                 "label": d.strftime('%b %d'),
-                "count": data.get(ds, 0)
+                "total_requests": total_data.get(ds, 0),
+                "completed_rescues": completed_data.get(ds, 0)
             })
             
         return result_list
 
     @staticmethod
     async def get_emergencies_by_category(db: AsyncSession):
-        from sqlalchemy import select, func
+        from sqlalchemy import select, func, and_
         from app.models.emergency_request import EmergencyRequest
         from app.models.emergency_category import EmergencyCategory
+        from app.models.enums import EmergencyStatus
         
+        # We need to outerjoin only completed emergency requests
+        # so that categories with 0 completed rescues still show up
         query = (
             select(
                 EmergencyCategory.name_en,
                 func.count(EmergencyRequest.id).label('count')
             )
-            .outerjoin(EmergencyRequest, EmergencyRequest.category_id == EmergencyCategory.id)
+            .outerjoin(
+                EmergencyRequest,
+                and_(
+                    EmergencyRequest.category_id == EmergencyCategory.id,
+                    EmergencyRequest.status == EmergencyStatus.COMPLETED
+                )
+            )
             .group_by(EmergencyCategory.id, EmergencyCategory.name_en)
             .order_by(func.count(EmergencyRequest.id).desc())
         )

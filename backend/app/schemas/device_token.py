@@ -8,3 +8,6 @@ class DeviceTokenRegisterRequest(BaseModel):
 
 class DeviceTokenResponse(BaseModel):
     message: str
+    
+class DeviceTokenDeleteRequest(BaseModel):
+    fcm_token: str
