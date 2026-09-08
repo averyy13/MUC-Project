@@ -55,6 +55,21 @@ async def dashboard_stats(
 ):
     return await AdminService.get_dashboard_stats(db)
 
+@router.get("/dashboard/emergencies-over-time")
+async def dashboard_emergencies_over_time(
+    period: str = Query("7d"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.get_emergencies_over_time(db, period)
+
+@router.get("/dashboard/emergencies-by-category")
+async def dashboard_emergencies_by_category(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.get_emergencies_by_category(db)
+
 @router.get("/emergencies")
 async def list_emergencies(
     status: str | None = Query(default=None),
@@ -76,3 +91,39 @@ async def list_emergency_contacts(
     current_user: User = Depends(require_admin),
 ):
     return await AdminService.list_emergency_contacts(db)
+
+from app.schemas.admin import MedicalFacilityUpdate, EmergencyContactUpdate
+
+@router.patch("/facilities/{facility_id}")
+async def update_facility(
+    facility_id: UUID,
+    update_data: MedicalFacilityUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.update_facility(db, facility_id, update_data)
+
+@router.patch("/facilities/{facility_id}/deactivate")
+async def deactivate_facility(
+    facility_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.deactivate_facility(db, facility_id)
+
+@router.patch("/emergency-contacts/{contact_id}")
+async def update_emergency_contact(
+    contact_id: UUID,
+    update_data: EmergencyContactUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.update_emergency_contact(db, contact_id, update_data)
+
+@router.patch("/emergency-contacts/{contact_id}/deactivate")
+async def deactivate_emergency_contact(
+    contact_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return await AdminService.deactivate_emergency_contact(db, contact_id)

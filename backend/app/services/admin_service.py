@@ -32,8 +32,9 @@ class AdminService:
                 "approval_status": v.approval_status.value,
                 "created_at": v.created_at.isoformat() if v.created_at else None,
                 "completed_rescues": count,
+                "current_location": {"lat": lat, "lng": lng} if lat is not None and lng is not None else None,
             }
-            for v, count in volunteers
+            for v, count, lng, lat in volunteers
         ]
 
     @staticmethod
@@ -54,8 +55,9 @@ class AdminService:
                 "approval_status": v.approval_status.value,
                 "created_at": v.created_at.isoformat() if v.created_at else None,
                 "completed_rescues": count,
+                "current_location": {"lat": lat, "lng": lng} if lat is not None and lng is not None else None,
             }
-            for v, count in volunteers
+            for v, count, lng, lat in volunteers
         ]
 
     @staticmethod
@@ -75,8 +77,9 @@ class AdminService:
                 "approval_status": v.approval_status.value,
                 "created_at": v.created_at.isoformat() if v.created_at else None,
                 "completed_rescues": count,
+                "current_location": {"lat": lat, "lng": lng} if lat is not None and lng is not None else None,
             }
-            for v, count in volunteers
+            for v, count, lng, lat in volunteers
         ]
 
     @staticmethod
@@ -179,6 +182,81 @@ class AdminService:
             "total_facilities": total_facilities,
             "total_rescue_organizations": total_rescue_organizations,
         }
+
+    @staticmethod
+    async def get_emergencies_over_time(db: AsyncSession, period: str):
+        from datetime import datetime, timedelta, timezone
+        now = datetime.now(timezone.utc)
+        
+        if period == "30d":
+            start_date = now - timedelta(days=29)
+        elif period == "3m":
+            start_date = now - timedelta(days=89)
+        else:
+            start_date = now - timedelta(days=6) # 7 days including today
+        
+        from sqlalchemy import select, func
+        from app.models.emergency_request import EmergencyRequest
+        
+        # We need to extract the date from created_at
+        # Assuming postgresql timezone mapping, but func.date() works in SQLAlchemy for postgres.
+        # However, to avoid time zone issues and make it robust, we can cast to date.
+        query = (
+            select(
+                func.date(EmergencyRequest.created_at).label('day'),
+                func.count(EmergencyRequest.id).label('count')
+            )
+            .where(EmergencyRequest.created_at >= start_date.replace(hour=0, minute=0, second=0, microsecond=0))
+            .group_by(func.date(EmergencyRequest.created_at))
+            .order_by(func.date(EmergencyRequest.created_at))
+        )
+        result = await db.execute(query)
+        rows = result.all()
+        
+        data = {}
+        for row in rows:
+            if row.day:
+                data[row.day.strftime('%Y-%m-%d')] = row.count
+            
+        days = (now.date() - start_date.date()).days
+        result_list = []
+        
+        for i in range(days + 1):
+            d = (start_date + timedelta(days=i)).date()
+            ds = d.strftime('%Y-%m-%d')
+            result_list.append({
+                "date": ds,
+                "label": d.strftime('%b %d'),
+                "count": data.get(ds, 0)
+            })
+            
+        return result_list
+
+    @staticmethod
+    async def get_emergencies_by_category(db: AsyncSession):
+        from sqlalchemy import select, func
+        from app.models.emergency_request import EmergencyRequest
+        from app.models.emergency_category import EmergencyCategory
+        
+        query = (
+            select(
+                EmergencyCategory.name_en,
+                func.count(EmergencyRequest.id).label('count')
+            )
+            .outerjoin(EmergencyRequest, EmergencyRequest.category_id == EmergencyCategory.id)
+            .group_by(EmergencyCategory.id, EmergencyCategory.name_en)
+            .order_by(func.count(EmergencyRequest.id).desc())
+        )
+        result = await db.execute(query)
+        rows = result.all()
+        
+        return [
+            {
+                "category": row.name_en,
+                "count": row.count
+            }
+            for row in rows
+        ]
 
     @staticmethod
     async def list_emergencies(db: AsyncSession, status_filter: str | None = None):
@@ -285,3 +363,96 @@ class AdminService:
             }
             for contact, lat, lng in rows
         ]
+
+    from app.schemas.admin import MedicalFacilityUpdate, EmergencyContactUpdate
+    from app.models.enums import MedicalFacilityType, OrganizationType
+
+    @staticmethod
+    async def update_facility(db: AsyncSession, facility_id, update_data):
+        from app.models.enums import MedicalFacilityType
+        query = select(MedicalFacility).where(MedicalFacility.id == facility_id)
+        result = await db.execute(query)
+        facility = result.scalar_one_or_none()
+        
+        if not facility:
+            raise HTTPException(status_code=404, detail="Medical facility not found")
+
+        update_dict = update_data.model_dump(exclude_unset=True)
+        if "type" in update_dict and update_dict["type"] is not None:
+            try:
+                update_dict["type"] = MedicalFacilityType(update_dict["type"])
+            except ValueError:
+                raise HTTPException(status_code=422, detail="Invalid facility type")
+
+        if "latitude" in update_dict and "longitude" in update_dict:
+            lat = update_dict.pop("latitude")
+            lng = update_dict.pop("longitude")
+            if lat is not None and lng is not None:
+                if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+                    raise HTTPException(status_code=422, detail="Invalid coordinates")
+                facility.location = f"SRID=4326;POINT({lng} {lat})"
+
+        for key, value in update_dict.items():
+            setattr(facility, key, value)
+            
+        await db.commit()
+        await db.refresh(facility)
+        return {"status": "success", "id": facility.id}
+
+    @staticmethod
+    async def deactivate_facility(db: AsyncSession, facility_id):
+        query = select(MedicalFacility).where(MedicalFacility.id == facility_id)
+        result = await db.execute(query)
+        facility = result.scalar_one_or_none()
+        
+        if not facility:
+            raise HTTPException(status_code=404, detail="Medical facility not found")
+            
+        facility.is_active = False
+        await db.commit()
+        return {"status": "success", "id": facility.id}
+
+    @staticmethod
+    async def update_emergency_contact(db: AsyncSession, contact_id, update_data):
+        from app.models.enums import OrganizationType
+        query = select(EmergencyContact).where(EmergencyContact.id == contact_id)
+        result = await db.execute(query)
+        contact = result.scalar_one_or_none()
+        
+        if not contact:
+            raise HTTPException(status_code=404, detail="Emergency contact not found")
+
+        update_dict = update_data.model_dump(exclude_unset=True)
+        if "type" in update_dict and update_dict["type"] is not None:
+            try:
+                update_dict["type"] = OrganizationType(update_dict["type"])
+            except ValueError:
+                raise HTTPException(status_code=422, detail="Invalid organization type")
+
+        if "latitude" in update_dict and "longitude" in update_dict:
+            lat = update_dict.pop("latitude")
+            lng = update_dict.pop("longitude")
+            if lat is not None and lng is not None:
+                if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+                    raise HTTPException(status_code=422, detail="Invalid coordinates")
+                contact.location = f"SRID=4326;POINT({lng} {lat})"
+
+        for key, value in update_dict.items():
+            setattr(contact, key, value)
+            
+        await db.commit()
+        await db.refresh(contact)
+        return {"status": "success", "id": contact.id}
+
+    @staticmethod
+    async def deactivate_emergency_contact(db: AsyncSession, contact_id):
+        query = select(EmergencyContact).where(EmergencyContact.id == contact_id)
+        result = await db.execute(query)
+        contact = result.scalar_one_or_none()
+        
+        if not contact:
+            raise HTTPException(status_code=404, detail="Emergency contact not found")
+            
+        contact.is_active = False
+        await db.commit()
+        return {"status": "success", "id": contact.id}

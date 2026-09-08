@@ -14,7 +14,10 @@ class AdminRepository:
         status: ApprovalStatus
     ):
         from app.models.volunteer_assignment import VolunteerAssignment
-        from sqlalchemy import func
+        from app.models.current_volunteer_location import CurrentVolunteerLocation
+        from geoalchemy2.functions import ST_X, ST_Y
+        from sqlalchemy import func, cast
+        from geoalchemy2 import Geometry
 
         rescue_counts = (
             select(
@@ -29,10 +32,13 @@ class AdminRepository:
         query = (
             select(
                 Volunteer,
-                func.coalesce(rescue_counts.c.completed_rescues, 0).label("completed_rescues")
+                func.coalesce(rescue_counts.c.completed_rescues, 0).label("completed_rescues"),
+                ST_X(cast(CurrentVolunteerLocation.location, Geometry("POINT", srid=4326))).label("lng"),
+                ST_Y(cast(CurrentVolunteerLocation.location, Geometry("POINT", srid=4326))).label("lat")
             )
             .options(selectinload(Volunteer.user))
             .outerjoin(rescue_counts, Volunteer.id == rescue_counts.c.volunteer_id)
+            .outerjoin(CurrentVolunteerLocation, Volunteer.id == CurrentVolunteerLocation.volunteer_id)
             .where(Volunteer.approval_status == status)
         )
 
