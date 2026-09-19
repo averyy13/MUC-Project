@@ -10,6 +10,7 @@ from app.schemas.location import (LocationUpdateRequest, AvailabilityUpdateReque
 from app.schemas.device_token import DeviceTokenRegisterRequest, DeviceTokenResponse
 from app.services.device_token_service import DeviceTokenService
 from app.schemas.emergency_request import EmergencyStatusResponse
+from app.schemas.rescue_history import RescueHistoryResponse
 
 router = APIRouter(
     prefix="/volunteers",
@@ -83,3 +84,14 @@ async def get_active_emergency(
         db=db,
         user_id=current_user.id,
     )
+@router.get(
+    "/me/rescue-history",response_model=list[RescueHistoryResponse],
+)
+async def get_rescue_history(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_volunteer),
+):
+    return await VolunteerService.get_rescue_history(
+        db=db,
+        user_id=current_user.id,
+    )   

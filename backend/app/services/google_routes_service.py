@@ -37,8 +37,10 @@ class GoogleRoutesService:
         except httpx.RequestError as exc:
             raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, 
                 detail=f"Unable to reach Google Routes API: {exc}") from exc
+        
         print("GOOGLE ROUTES STATUS:", response.status_code)
         print("GOOGLE ROUTES RESPONSE:", response.text)
+        
         if response.status_code != 200:
             try:
                 error_body = response.json()
@@ -57,9 +59,14 @@ class GoogleRoutesService:
                 detail="Google Routes API returned invalid JSON") from exc
 
         routes = data.get("routes") or []
+        
+        # THE FIX: Safely handle 0km routes (e.g., testing with phones in the same room)
         if not routes:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                detail="Google Routes API could not find a route.")
+            return {
+                "distance_meters": 0,
+                "duration_seconds": 0,
+                "encoded_polyline": "",
+            }
 
         route = routes[0]
         distance_meters = route.get("distanceMeters")

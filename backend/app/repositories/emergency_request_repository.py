@@ -13,7 +13,6 @@ from app.models.current_volunteer_location import CurrentVolunteerLocation
 from app.repositories.volunteer_assignment_repository import VolunteerAssignmentRepository
 
 class EmergencyRequestRepository:
-    
     @staticmethod
     async def create(db: AsyncSession, emergency: EmergencyRequest) -> EmergencyRequest:
         db.add(emergency)
@@ -154,12 +153,9 @@ class EmergencyRequestRepository:
                     f"from status {emergency.status.value}"
                 ),
             )
-
         emergency.status = EmergencyStatus.CANCELLED
-
         await db.flush()
         await db.refresh(emergency)
-
         return emergency
     
     @staticmethod
@@ -185,5 +181,4 @@ class EmergencyRequestRepository:
             )
             .limit(1)
         )
-    
         return result.scalar_one_or_none()

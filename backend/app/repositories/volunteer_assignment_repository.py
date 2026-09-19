@@ -1,10 +1,14 @@
 from __future__ import annotations
 from datetime import datetime, timezone
+from unittest import result
 from uuid import UUID
-from sqlalchemy import func, select
+from geoalchemy2 import Geometry
+from sqlalchemy import cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.enums import AssignmentStatus
 from app.models.volunteer_assignment import VolunteerAssignment
+from app.models.emergency_category import EmergencyCategory
+from app.models.emergency_request import EmergencyRequest
 
 class VolunteerAssignmentRepository:
     @staticmethod
@@ -107,6 +111,17 @@ class VolunteerAssignmentRepository:
         )
         return result.scalar_one()
     
+    @staticmethod
+    async def get_completed_for_volunteer(db: AsyncSession, volunteer_id: UUID):
+        loc = cast(EmergencyRequest.location, Geometry("POINT", srid=4326))
+        return (await db.execute(
+            select(VolunteerAssignment, EmergencyRequest, EmergencyCategory, func.ST_Y(loc).label("latitude"), func.ST_X(loc).label("longitude"))
+            .join(EmergencyRequest, VolunteerAssignment.request_id == EmergencyRequest.id)
+            .join(EmergencyCategory, EmergencyRequest.category_id == EmergencyCategory.id)
+            .where(VolunteerAssignment.volunteer_id == volunteer_id, VolunteerAssignment.status == AssignmentStatus.COMPLETED)
+            .order_by(VolunteerAssignment.completed_at.desc())
+        )).all()
+
     @staticmethod
     async def cancel(
         db: AsyncSession,

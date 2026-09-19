@@ -158,8 +158,7 @@ class VolunteerService:
         db: AsyncSession,
         user_id,
     ):
-        volunteer = await VolunteerRepository.get_by_user_id(
-            db,
+        volunteer = await VolunteerRepository.get_by_user_id(db,
             user_id,
         )
     
@@ -181,3 +180,22 @@ class VolunteerService:
             db,
             assignment.request_id,
         )
+        
+    @staticmethod
+    async def get_rescue_history(db: AsyncSession, user_id):
+        volunteer = await VolunteerRepository.get_by_user_id(db, user_id)
+        if not volunteer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Volunteer not found")
+    
+        records = await VolunteerAssignmentRepository.get_completed_for_volunteer(db=db, volunteer_id=volunteer.id)
+    
+        return [{
+            "emergency_id": emergency.id,
+            "category_id": category.id,
+            "category_name_en": category.name_en,
+            "category_name_mm": category.name_mm,
+            "description": emergency.description,
+            "latitude": float(latitude),
+            "longitude": float(longitude),
+            "completed_at": assignment.completed_at,
+        } for assignment, emergency, category, latitude, longitude in records]
